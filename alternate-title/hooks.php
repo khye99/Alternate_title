@@ -1,10 +1,36 @@
 <?php
 
-   // Add an Alternate Title meta box to Gutenberg pages/post backend editor
+   // The functionality is to add an Alternate Title meta box to Gutenberg pages backend editor
 
+
+   /**
+    *
+    * Adding actual input block to the editor
+    *
+    */ 
+    function alternate_title_gutenberg_add_meta_box() {
+      global $current_screen;
+
+      if(method_exists($current_screen, "is_block_editor") && $current_screen->is_block_editor()) {
+         add_meta_box(
+            "alternate_title_gutenberg_meta_box", //id
+            __("Alternate Title", "alternate-title"), // title
+            "alternate_title_gutenberg_meta_box_content" // callback
+         );
+      }
+   }
+   add_action("add_meta_boxes", "alternate_title_gutenberg_add_meta_box");
+
+   /**
+    *
+    * Adding the text and placeholder text to the meta box
+    *
+    * @param   object $post object
+    *
+    */ 
    function alternate_title_gutenberg_meta_box_content($post) {
       $alternate_title = get_alternate_title($post->ID);
-      $title           = __("Enter alternate title here", "alternate-title");
+      $title           = __("Enter title here", "alternate-title");
       $placeholder     = $title . "...";
       ?>
       <input type="text" 
@@ -18,22 +44,11 @@
       <?php
    }
 
-   // Adding actual input block to the editor
-
-   function alternate_title_gutenberg_add_meta_box() {
-      global $current_screen;
-
-      if(method_exists($current_screen, "is_block_editor") && $current_screen->is_block_editor()) {
-         add_meta_box(
-            "alternate_title_gutenberg_meta_box",
-            __("Alternate Title", "alternate-title"),
-            "alternate_title_gutenberg_meta_box_content"
-         );
-      }
-   }
-   add_action("add_meta_boxes", "alternate_title_gutenberg_add_meta_box");
-
-   // Registers a meta key.
+   /**
+    *
+    * Registers a meta key
+    *
+    */ 
 
    function alternate_title_gutenberg_register_meta() {
       register_meta(
@@ -49,8 +64,14 @@
    add_action("init", "alternate_title_gutenberg_register_meta");
 
 
-   // pdates the alternate title after page/post is saved/published
-   // @return bool|int
+   /**
+    *
+    * Updates the alternate title after page is saved/published
+    *
+    * @param   int a post ID
+    * @return  bool/int
+    *
+    */ 
 
     function alternate_title_edit_post($post_id) {
       if(!isset($_POST["alternate_post_title"])) {
@@ -73,7 +94,7 @@
          return false;
       }
 
-      // Updates the value of an existing meta key (custom field) for the specified post
+      // Updates the value of an existing meta key (custom field) for the specified p
       return update_post_meta (
          $post_id,
          "_alternate_title",
